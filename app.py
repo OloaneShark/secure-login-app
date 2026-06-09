@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -42,7 +43,9 @@ def register():
         if password != confirm_password:
             return "Passwords do not match."
 
-        new_user = User(username=username, password=password)
+        hashed_password = generate_password_hash(password)
+
+        new_user = User(username=username, password=hashed_password)
 
         db.session.add(new_user)
         db.session.commit()
