@@ -39,9 +39,15 @@ def register():
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
 
-        print(f"Register Username: {username}")
-        print(f"Register Password: {password}")
-        print(f"Confirm Password: {confirm_password}")
+        if password != confirm_password:
+            return "Passwords do not match."
+
+        new_user = User(username=username, password=password)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return "Account created successfully."
 
     return render_template("register.html")
 
