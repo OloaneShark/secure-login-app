@@ -54,6 +54,14 @@ def dashboard():
     return redirect(url_for("login"))
 
 
+@app.route("/profile")
+def profile():
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    return render_template("profile.html", username=session["username"])
+
+
 @app.route("/logout")
 def logout():
     session.pop("username", None)
