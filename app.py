@@ -49,11 +49,18 @@ def login():
 
 @app.route("/dashboard")
 def dashboard():
-
     if "username" in session:
+        return f"""
+        <h1>Welcome, {session['username']}!</h1>
+        <a href="/logout">Logout</a>
+        """
 
-        return f"Welcome, {session['username']}!"
+    return redirect(url_for("login"))
 
+
+@app.route("/logout")
+def logout():
+    session.pop("username", None)
     return redirect(url_for("login"))
 
 
