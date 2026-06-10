@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, render_template, request, redirect, url_for, session
 
 app = Flask(__name__)
+
+app.secret_key = "supersecretkey"
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -23,14 +26,35 @@ def home():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+
     if request.method == "POST":
+
         username = request.form.get("username")
         password = request.form.get("password")
 
-        print(f"Login Username: {username}")
-        print(f"Login Password: {password}")
+        user = User.query.filter_by(username=username).first()
+
+        if user and check_password_hash(user.password, password):
+
+            session["username"] = user.username
+
+            return redirect(url_for("dashboard"))
+
+        else:
+
+            return "Invalid username or password."
 
     return render_template("login.html")
+
+
+@app.route("/dashboard")
+def dashboard():
+
+    if "username" in session:
+
+        return f"Welcome, {session['username']}!"
+
+    return redirect(url_for("login"))
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -39,6 +63,11 @@ def register():
         username = request.form.get("username")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
+
+        existing_user = User.query.filter_by(username=username).first()
+
+        if existing_user:
+            return "Username already exists."
 
         if password != confirm_password:
             return "Passwords do not match."
