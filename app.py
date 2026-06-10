@@ -102,6 +102,36 @@ def change_password():
     return render_template("change_password.html")
 
 
+@app.route("/delete-account", methods=["GET", "POST"])
+def delete_account():
+
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    user = User.query.filter_by(username=session["username"]).first()
+
+    if request.method == "POST":
+
+        password = request.form.get("password")
+
+        if not check_password_hash(user.password, password):
+
+            flash("Incorrect password.")
+            return redirect(url_for("delete_account"))
+
+        db.session.delete(user)
+
+        db.session.commit()
+
+        session.pop("username", None)
+
+        flash("Account deleted successfully.")
+
+        return redirect(url_for("register"))
+
+    return render_template("delete_account.html")
+
+
 @app.route("/logout")
 def logout():
     session.pop("username", None)
