@@ -50,10 +50,7 @@ def login():
 @app.route("/dashboard")
 def dashboard():
     if "username" in session:
-        return f"""
-        <h1>Welcome, {session['username']}!</h1>
-        <a href="/logout">Logout</a>
-        """
+        return render_template("dashboard.html", username=session["username"])
 
     return redirect(url_for("login"))
 
