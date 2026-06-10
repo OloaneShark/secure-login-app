@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
 
@@ -42,7 +42,8 @@ def login():
 
         else:
 
-            return "Invalid username or password."
+            flash("Invalid username or password.")
+            return redirect(url_for("login"))
 
     return render_template("login.html")
 
@@ -71,10 +72,12 @@ def register():
         existing_user = User.query.filter_by(username=username).first()
 
         if existing_user:
-            return "Username already exists."
+            flash("Username already exists.")
+            return redirect(url_for("register"))
 
         if password != confirm_password:
-            return "Passwords do not match."
+            flash("Passwords do not match.")
+            return redirect(url_for("register"))
 
         hashed_password = generate_password_hash(password)
 
@@ -83,7 +86,8 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        return "Account created successfully."
+        flash("Account created successfully. Please log in.")
+        return redirect(url_for("login"))
 
     return render_template("register.html")
 
