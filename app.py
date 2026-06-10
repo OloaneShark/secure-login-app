@@ -65,6 +65,43 @@ def profile():
     return render_template("profile.html", user=user)
 
 
+@app.route("/change-password", methods=["GET", "POST"])
+def change_password():
+
+    if "username" not in session:
+        return redirect(url_for("login"))
+
+    user = User.query.filter_by(username=session["username"]).first()
+
+    if request.method == "POST":
+
+        current_password = request.form.get("current_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        if not check_password_hash(user.password, current_password):
+
+            flash("Current password is incorrect.")
+            return redirect(url_for("change_password"))
+
+        if new_password != confirm_password:
+
+            flash("New passwords do not match.")
+            return redirect(url_for("change_password"))
+
+        hashed_password = generate_password_hash(new_password)
+
+        user.password = hashed_password
+
+        db.session.commit()
+
+        flash("Password updated successfully.")
+
+        return redirect(url_for("profile"))
+
+    return render_template("change_password.html")
+
+
 @app.route("/logout")
 def logout():
     session.pop("username", None)
