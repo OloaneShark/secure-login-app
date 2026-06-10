@@ -1,32 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
-<body>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <h1>Create Account</h1>
+{% extends "base.html" %}
 
-    <form method="POST">
-        <input type="text" name="username" placeholder="Username">
-        <br><br>
+{% block title %}
+Register
+{% endblock %}
 
-        <input type="password" name="password" placeholder="Password">
-        <br><br>
+{% block content %}
 
-        <input type="password" name="confirm_password" placeholder="Confirm Password">
-        <br><br>
+<h1>Create Account</h1>
 
-        <button type="submit">Register</button>
-    </form>
+<form method="POST">
 
-    <p>Already have an account?</p>
-    <a href="/login">Login here</a>
-</body>
-</html>
+    <input type="text" name="username" placeholder="Username">
+    <br><br>
+
+    <input type="password" name="password" placeholder="Password">
+    <br><br>
+
+    <input type="password" name="confirm_password" placeholder="Confirm Password">
+    <br><br>
+
+    <button type="submit">Register</button>
+
+</form>
+
+{% endblock %}

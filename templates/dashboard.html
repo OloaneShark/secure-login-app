@@ -1,15 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-</head>
-<body>
-    <h1>DASHBOARD TEST</h1>
+{% extends "base.html" %}
 
-    <h2>Welcome, {{ username }}!</h2>
+{% block title %}
+Dashboard
+{% endblock %}
 
-    <p>You are logged in.</p>
+{% block content %}
 
-    <a href="/logout">Logout</a>
-</body>
-</html>
+<h1>Dashboard</h1>
+
+<h2>Welcome, {{ username }}!</h2>
+
+<p>You are logged in.</p>
+
+{% endblock %}

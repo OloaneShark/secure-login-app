@@ -1,14 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Secure Login App</title>
-</head>
-<body>
-    <h1>Welcome to Secure Login App</h1>
+{% extends "base.html" %}
 
-    <p>My Flask app is working.</p>
+{% block title %}
+Home
+{% endblock %}
 
-    <a href="/register">Create Account</a>
+{% block content %}
 
-</body>
-</html>
+<h1>Welcome to Secure Login App</h1>
+
+<p>My Flask app is working.</p>
+
+{% endblock %}
