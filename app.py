@@ -56,10 +56,13 @@ def dashboard():
 
 @app.route("/profile")
 def profile():
+
     if "username" not in session:
         return redirect(url_for("login"))
 
-    return render_template("profile.html", username=session["username"])
+    user = User.query.filter_by(username=session["username"]).first()
+
+    return render_template("profile.html", user=user)
 
 
 @app.route("/logout")
