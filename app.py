@@ -1,4 +1,5 @@
 
+from models import db, User, Post
 from functools import wraps
 from flask import Flask, render_template, request
 from models import db, User
@@ -93,6 +94,77 @@ def dashboard():
     return render_template(
         "dashboard.html",
         username=session["username"]
+    )
+
+
+@app.route("/posts", methods=["GET", "POST"])
+@login_required
+def posts():
+    user = User.query.filter_by(username=session["username"]).first()
+
+    if request.method == "POST":
+        content = request.form.get("content")
+
+        new_post = Post(content=content, user_id=user.id)
+
+        db.session.add(new_post)
+        db.session.commit()
+
+        flash("Post created.")
+
+        return redirect(url_for("posts"))
+
+    all_posts = Post.query.all()
+
+    return render_template("posts.html", posts=all_posts)
+
+
+@app.route("/delete-post/<int:post_id>", methods=["POST"])
+@login_required
+def delete_post(post_id):
+    user = User.query.filter_by(username=session["username"]).first()
+
+    post = Post.query.get_or_404(post_id)
+
+    if post.user_id != user.id:
+        flash("You are not allowed to delete this post.")
+        return redirect(url_for("posts"))
+
+    db.session.delete(post)
+    db.session.commit()
+
+    flash("Post deleted.")
+
+    return redirect(url_for("posts"))
+
+
+@app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
+@login_required
+def edit_post(post_id):
+
+    user = User.query.filter_by(
+        username=session["username"]
+    ).first()
+
+    post = Post.query.get_or_404(post_id)
+
+    if post.user_id != user.id:
+        flash("You are not allowed to edit this post.")
+        return redirect(url_for("posts"))
+
+    if request.method == "POST":
+
+        post.content = request.form.get("content")
+
+        db.session.commit()
+
+        flash("Post updated.")
+
+        return redirect(url_for("posts"))
+
+    return render_template(
+        "edit_post.html",
+        post=post
     )
 
 
