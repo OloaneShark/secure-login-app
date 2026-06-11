@@ -1,4 +1,5 @@
 
+from functools import wraps
 from flask import Flask, render_template, request
 from models import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,6 +13,19 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
+
+
+def login_required(f):
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+
+        if "username" not in session:
+            return redirect(url_for("login"))
+
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 @app.route("/")
@@ -47,18 +61,18 @@ def login():
 
 
 @app.route("/dashboard")
+@login_required
 def dashboard():
-    if "username" in session:
-        return render_template("dashboard.html", username=session["username"])
 
-    return redirect(url_for("login"))
+    return render_template(
+        "dashboard.html",
+        username=session["username"]
+    )
 
 
 @app.route("/profile")
+@login_required
 def profile():
-
-    if "username" not in session:
-        return redirect(url_for("login"))
 
     user = User.query.filter_by(username=session["username"]).first()
 
@@ -66,10 +80,8 @@ def profile():
 
 
 @app.route("/change-password", methods=["GET", "POST"])
+@login_required
 def change_password():
-
-    if "username" not in session:
-        return redirect(url_for("login"))
 
     user = User.query.filter_by(username=session["username"]).first()
 
@@ -103,10 +115,8 @@ def change_password():
 
 
 @app.route("/delete-account", methods=["GET", "POST"])
+@login_required
 def delete_account():
-
-    if "username" not in session:
-        return redirect(url_for("login"))
 
     user = User.query.filter_by(username=session["username"]).first()
 
