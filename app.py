@@ -28,6 +28,32 @@ def login_required(f):
     return decorated_function
 
 
+@app.route("/edit-profile", methods=["GET", "POST"])
+@login_required
+def edit_profile():
+
+    user = User.query.filter_by(
+        username=session["username"]
+    ).first()
+
+    if request.method == "POST":
+
+        bio = request.form.get("bio")
+
+        user.bio = bio
+
+        db.session.commit()
+
+        flash("Profile updated.")
+
+        return redirect(url_for("profile"))
+
+    return render_template(
+        "edit_profile.html",
+        user=user
+    )
+
+
 @app.route("/")
 def home():
     return render_template("index.html")
