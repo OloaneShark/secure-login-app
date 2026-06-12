@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -23,6 +24,8 @@ class Post(db.Model):
 
     user = db.relationship("User", backref="posts")
     
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
     
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,3 +46,4 @@ class Comment(db.Model):
 
     user = db.relationship("User")
     post = db.relationship("Post", backref="comments")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

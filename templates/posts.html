@@ -23,6 +23,9 @@ Posts
 
     {% if post.user.username == session["username"] %}
         <br>
+    
+        <br>
+        <small>Posted at: {{ post.created_at }}</small>
 
         <a href="/edit-post/{{ post.id }}">Edit</a>
 
@@ -40,6 +43,9 @@ Posts
 
     {% if comment.user.username == session["username"] %}
         <br>
+
+        <br>
+        <small>Commented at: {{ comment.created_at }}</small>
 
         <a href="/edit-comment/{{ comment.id }}">Edit</a>
 
