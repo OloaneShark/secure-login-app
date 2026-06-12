@@ -339,13 +339,20 @@ def register():
     
     if request.method == "POST":
         username = request.form.get("username")
+        email = request.form.get("email")
         password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
 
         existing_user = User.query.filter_by(username=username).first()
 
+        existing_email = User.query.filter_by(email=email).first()
+
         if existing_user:
             flash("Username already exists.")
+            return redirect(url_for("register"))
+        
+        if existing_email:
+            flash("Email already exists.")
             return redirect(url_for("register"))
 
         if password != confirm_password:
@@ -354,7 +361,7 @@ def register():
 
         hashed_password = generate_password_hash(password)
 
-        new_user = User(username=username, password=hashed_password)
+        new_user = User(username=username, email=email, password=hashed_password)
 
         db.session.add(new_user)
         db.session.commit()
