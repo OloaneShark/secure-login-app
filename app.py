@@ -1,4 +1,9 @@
 
+##TODAY IS JUNE 12, 2026 AT 1:05 PM EST
+##THIS WAS FINALLY MIGRATED NEON POSTGRESQL
+##ONE STEP CLOSER THAT I CAN TASTE IT
+##HAHAHAHAHA HELL YEAH
+
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, session, flash
