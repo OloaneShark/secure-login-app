@@ -10,7 +10,7 @@ class User(db.Model):
 
     username = db.Column(db.String(80), unique=True, nullable=False)
 
-    password = db.Column(db.String(120), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
 
     bio = db.Column(db.String(500), nullable=True)
     
