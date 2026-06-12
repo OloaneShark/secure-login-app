@@ -1,4 +1,5 @@
 
+from models import db, User, Post, Comment
 from models import db, User, Post
 from functools import wraps
 from flask import Flask, render_template, request
@@ -117,6 +118,52 @@ def posts():
     all_posts = Post.query.all()
 
     return render_template("posts.html", posts=all_posts)
+
+
+@app.route("/add-comment/<int:post_id>", methods=["POST"])
+@login_required
+def add_comment(post_id):
+    user = User.query.filter_by(username=session["username"]).first()
+
+    post = Post.query.get_or_404(post_id)
+
+    content = request.form.get("content")
+
+    new_comment = Comment(
+        content=content,
+        user_id=user.id,
+        post_id=post.id
+    )
+
+    db.session.add(new_comment)
+    db.session.commit()
+
+    flash("Comment added.")
+
+    return redirect(url_for("posts"))
+
+
+@app.route("/edit-comment/<int:comment_id>", methods=["GET", "POST"])
+@login_required
+def edit_comment(comment_id):
+    user = User.query.filter_by(username=session["username"]).first()
+
+    comment = Comment.query.get_or_404(comment_id)
+
+    if comment.user_id != user.id:
+        flash("You are not allowed to edit this comment.")
+        return redirect(url_for("posts"))
+
+    if request.method == "POST":
+        comment.content = request.form.get("content")
+
+        db.session.commit()
+
+        flash("Comment updated.")
+
+        return redirect(url_for("posts"))
+
+    return render_template("edit_comment.html", comment=comment)
 
 
 @app.route("/delete-post/<int:post_id>", methods=["POST"])
@@ -238,6 +285,25 @@ def delete_account():
         return redirect(url_for("register"))
 
     return render_template("delete_account.html")
+
+
+@app.route("/delete-comment/<int:comment_id>", methods=["POST"])
+@login_required
+def delete_comment(comment_id):
+    user = User.query.filter_by(username=session["username"]).first()
+
+    comment = Comment.query.get_or_404(comment_id)
+
+    if comment.user_id != user.id:
+        flash("You are not allowed to delete this comment.")
+        return redirect(url_for("posts"))
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    flash("Comment deleted.")
+
+    return redirect(url_for("posts"))
 
 
 @app.route("/logout")

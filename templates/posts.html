@@ -31,6 +31,33 @@ Posts
         </form>
     {% endif %}
 
+    <h4>Comments</h4>
+
+    {% for comment in post.comments %}
+    <p>{{ comment.content }}</p>
+
+    <small>Comment by: {{ comment.user.username }}</small>
+
+    {% if comment.user.username == session["username"] %}
+        <br>
+
+        <a href="/edit-comment/{{ comment.id }}">Edit</a>
+
+        <form method="POST" action="/delete-comment/{{ comment.id }}">
+            <button type="submit">Delete</button>
+        </form>
+    {% endif %}
+
+    <br><br>
+{% endfor %}
+
+    <form method="POST" action="/add-comment/{{ post.id }}">
+        <input type="text" name="content" placeholder="Write a comment">
+        <button type="submit">Comment</button>
+    </form>
+
+
+    
     <hr>
 {% endfor %}
 
