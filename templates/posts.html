@@ -17,7 +17,16 @@ Posts
 
 <hr>
 
-{% for post in posts %}
+
+<form method="GET" action="/posts">
+    <input type="text" name="q" placeholder="Search posts">
+    <button type="submit">Search</button>
+</form>
+
+<br>
+
+
+{% for post in posts.items %}
     <p>{{ post.content }}</p>
     <small>Posted by: {{ post.user.username }}</small>
 
@@ -61,10 +70,20 @@ Posts
         <input type="text" name="content" placeholder="Write a comment">
         <button type="submit">Comment</button>
     </form>
-
-
-    
+ 
     <hr>
 {% endfor %}
+
+{% if posts.has_prev %}
+    <a href="{{ url_for('posts', page=posts.prev_num) }}">
+        Previous
+    </a>
+{% endif %}
+
+{% if posts.has_next %}
+    <a href="{{ url_for('posts', page=posts.next_num) }}">
+        Next
+    </a>
+{% endif %}
 
 {% endblock %}

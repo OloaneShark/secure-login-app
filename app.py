@@ -115,9 +115,28 @@ def posts():
 
         return redirect(url_for("posts"))
 
-    all_posts = Post.query.all()
+    page = request.args.get("page", 1, type=int)
 
-    return render_template("posts.html", posts=all_posts)
+    search_query = request.args.get("q")
+
+    if search_query:
+        posts = Post.query.filter(
+            Post.content.contains(search_query)
+        ).order_by(
+            Post.created_at.desc()
+        ).paginate(
+            page=page,
+            per_page=5
+        )
+    else:
+        posts = Post.query.order_by(
+            Post.created_at.desc()
+        ).paginate(
+            page=page,
+            per_page=5
+        )
+
+    return render_template("posts.html", posts=posts)
 
 
 @app.route("/add-comment/<int:post_id>", methods=["POST"])
