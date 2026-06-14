@@ -7,6 +7,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from authlib.integrations.flask_client import OAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from models import db, User, Post, Comment
@@ -17,6 +18,18 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv("SECRET_KEY")
 
+oauth = OAuth(app)
+
+google = oauth.register(
+    name="google",
+    client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={
+        "scope": "openid email profile"
+    }
+)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -32,6 +45,39 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
+
+
+@app.route("/login/google")
+def google_login():
+    redirect_uri = url_for("google_authorized", _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+
+@app.route("/login/google/authorized")
+def google_authorized():
+    token = google.authorize_access_token()
+    user_info = token["userinfo"]
+
+    email = user_info["email"]
+    username = user_info.get("name", email.split("@")[0])
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        user = User(
+            username=username,
+            email=email,
+            password="GOOGLE_OAUTH_USER"
+        )
+
+        db.session.add(user)
+        db.session.commit()
+
+    session["username"] = user.username
+
+    flash("Logged in with Google.")
+
+    return redirect(url_for("dashboard"))
 
 
 def login_required(f):
