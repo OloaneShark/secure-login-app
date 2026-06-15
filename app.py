@@ -32,6 +32,8 @@ db.init_app(app)
 
 oauth = OAuth(app)
 
+failed_attempts = {}
+
 google = oauth.register(
     name="google",
     client_id=os.getenv("GOOGLE_CLIENT_ID"),
@@ -170,11 +172,20 @@ def login():
 
         username = request.form.get("username")
         password = request.form.get("password")
+        
+        if username not in failed_attempts:
+            failed_attempts[username] = 0
+            
+        if failed_attempts[username] >= 5:
+            log_event("RATE_LIMIT_TRIGGERED", username)
+            flash("Too many failed login attempts.")
+            return redirect(url_for("login"))
 
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-
+            failed_attempts[username] = 0
+            
             session["username"] = user.username
             
             log_event("LOGIN_SUCCESS", user.username)
@@ -182,6 +193,7 @@ def login():
             return redirect(url_for("dashboard"))
 
         else:
+            failed_attempts[username] += 1
             
             log_event("LOGIN_FAILURE", username)
 
