@@ -120,6 +120,31 @@ def home():
     return render_template("index.html")
 
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "username" not in session:
+            return redirect(url_for("login"))
+
+        user = User.query.filter_by(username=session["username"]).first()
+
+        if not user or not user.is_admin:
+            flash("Admin access required.")
+            return redirect(url_for("dashboard"))
+
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
+@app.route("/admin")
+@login_required
+@admin_required
+def admin_dashboard():
+    users = User.query.all()
+    return render_template("admin.html", users=users)
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
