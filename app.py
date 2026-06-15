@@ -12,7 +12,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from authlib.integrations.flask_client import OAuth
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from models import db, User, Post, Comment
+from models import db, User, Post, Comment, AuditLog
 
 load_dotenv()
 
@@ -70,6 +70,8 @@ def google_authorized():
         db.session.commit()
 
     session["username"] = user.username
+    
+    log_event("GOOGLE_LOGIN_SUCCESS", user.username)
 
     flash("Logged in with Google.")
 
@@ -87,6 +89,17 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def log_event(action, username=None):
+    log = AuditLog(
+        username=username,
+        action=action,
+        ip_address=request.remote_addr
+    )
+
+    db.session.add(log)
+    db.session.commit()
 
 
 @app.route("/edit-profile", methods=["GET", "POST"])
@@ -130,6 +143,7 @@ def admin_required(f):
 
         if not user or not user.is_admin:
             flash("Admin access required.")
+            log_event("ADMIN_ACCESS_DENIED", session.get("username"))
             return redirect(url_for("dashboard"))
 
         return f(*args, **kwargs)
@@ -142,6 +156,7 @@ def admin_required(f):
 @admin_required
 def admin_dashboard():
     users = User.query.all()
+    log_event("ADMIN_ACCESS_GRANTED", session.get("username"))
     return render_template("admin.html", users=users)
 
 
@@ -161,10 +176,14 @@ def login():
         if user and check_password_hash(user.password, password):
 
             session["username"] = user.username
+            
+            log_event("LOGIN_SUCCESS", user.username)
 
             return redirect(url_for("dashboard"))
 
         else:
+            
+            log_event("LOGIN_FAILURE", username)
 
             flash("Invalid username or password.")
             return redirect(url_for("login"))
