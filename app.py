@@ -62,7 +62,8 @@ def google_authorized():
         user = User(
             username=username,
             email=email,
-            password="GOOGLE_OAUTH_USER"
+            password="GOOGLE_OAUTH_USER",
+            auth_provider="google"
         )
 
         db.session.add(user)
@@ -419,8 +420,13 @@ def register():
 
         hashed_password = generate_password_hash(password)
 
-        new_user = User(username=username, email=email, password=hashed_password)
-
+        new_user = User(
+            username=username,
+            email=email,
+            password=hashed_password,
+            auth_provider="local"
+        )
+        
         db.session.add(new_user)
         db.session.commit()
 

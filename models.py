@@ -11,6 +11,8 @@ class User(db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
 
     password = db.Column(db.String(255), nullable=False)
+    
+    auth_provider = db.Column(db.String(50), default="local")
 
     bio = db.Column(db.String(500), nullable=True)
     
