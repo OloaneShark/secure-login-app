@@ -492,6 +492,18 @@ def register():
     return render_template("register.html")
 
 
+@app.after_request
+def add_security_headers(response):
+
+    response.headers["X-Content-Type-Options"] = "nosniff"
+
+    response.headers["X-Frame-Options"] = "DENY"
+
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+    return response
+
+
 with app.app_context():
     db.create_all()
 
