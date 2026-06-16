@@ -10,13 +10,31 @@ Features:
     User registration
     User login/logout
     Password hashing
+    Google OAuth login
     User profiles
+    Role-based access control (Admin/User)
+    Audit logging
+    Login rate limiting
+    Security headers
     PostgreSQL database integration
     Docker containerization
     AWS EC2 deployment
     Gunicorn production server
+    Automated CI/CD pipeline
+    Dependency vulnerability scanning
+    Container vulnerability scanning
 
-Stack I used:
+Security Features:
+    Password hashing using Werkzeug
+    Google OAuth authentication
+    Role-based access control (RBAC)
+    Audit logging for security events
+    Login rate limiting against brute-force attacks
+    Security response headers
+    Dependency vulnerability scanning
+    Container vulnerability scanning
+
+Stack I Used:
     Python
     Flask
     SQLAlchemy
@@ -25,6 +43,10 @@ Stack I used:
     AWS EC2
     Gunicorn
     GitHub
+    GitHub Actions
+    Google OAuth
+    pip-audit
+    Trivy
 
 My local setup:
     1. I clone the repository
@@ -49,10 +71,10 @@ Deployment:
         while using Gunicorn as the application server.
 
 Future Improvements:
-    Google OAuth
     HTTPS / SSL
     Custom domain
-    CI/CD with GitHub Actions
     Password reset functionality
     Profile image uploads
-    Security monitoring
+    Advanced security monitoring
+    Redis-backed rate limiting
+    Nginx reverse proxy
