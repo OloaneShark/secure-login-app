@@ -17,3 +17,9 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t secure-login-app .
+
+      - name: Run dependency security audit
+        run: pip-audit -r requirements.txt
+
+      - name: Build Docker image
+        run: docker build -t secure-login-app .
